@@ -60,7 +60,6 @@ describe('/artists', () => {
               });
             });
         });
-    });
 
     describe('GET /artists/:artistId', () => {
         it('gets artist record by id', (done) => {
@@ -74,5 +73,84 @@ describe('/artists', () => {
               done();
             });
         });
+
+        it('returns a 404 if the artist does not exist', (done) => {
+            request(app)
+              .get('/artists/12345')
+              .then((res) => {
+                expect(res.status).to.equal(404);
+                expect(res.body.error).to.equal('the artist could not be found.');
+                done();
+              });
+          });
     });
+
+    describe('PATCH /artists/:id', () => {
+        it('updates artist genre by id', (done) => {
+          const artist = artists[0];
+          request(app)
+            .patch(`/artists/${artist.id}`)
+            .send({ genre: 'Psychedelic Rock' })
+            .then((res) => {
+              expect(res.status).to.equal(200);
+              Artist.findByPk(artist.id, { raw: true }).then((updatedArtist) => {
+                expect(updatedArtist.genre).to.equal('Psychedelic Rock');
+                done();
+              });
+            });
+        });
+    });
+
+    describe('PATCH /artists/:id', () => {
+        it('updates artist name by id', (done) => {
+        const artist = artists[0];
+        request(app)
+            .patch(`/artists/${artist.id}`)
+            .send({ name: 'MGMT' })
+            .then((res) => {
+             expect(res.status).to.equal(200);
+             Artist.findByPk(artist.id, { raw: true}).then((updatedArtist) => {
+                expect(updatedArtist.name).to.equal('MGMT');
+                done();
+            });
+            });
+        });
+
+        it('returns a 404 if the artist does not exist', (done) => {
+            request(app)
+              .get('/artists/12345')
+              .then((res) => {
+                expect(res.status).to.equal(404);
+                expect(res.body.error).to.equal('the artist could not be found.');
+                done();
+              });
+          });   
+        });     
+
+    describe('DELETE /artists/:artistId', () => {
+        it('deletes artist record by id', (done) => {
+          const artist = artists[0];
+          request(app)
+            .delete(`/artists/${artist.id}`)
+            .then((res) => {
+              expect(res.status).to.equal(204);
+              Artist.findByPk(artist.id, { raw: true }).then((updatedArtist) => {
+                expect(updatedArtist).to.equal(null);
+                done();
+              });
+            });
+        });
+
+        it('returns a 404 if the artist does not exist', (done) => {
+          request(app)
+            .get('/artists/12345')
+            .then((res) => {
+              expect(res.status).to.equal(404);
+              expect(res.body.error).to.equal('the artist could not be found.');
+              done();
+            });
+        });
+    });
+}); 
+
 });
